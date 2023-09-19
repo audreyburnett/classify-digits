@@ -49,10 +49,10 @@ case "${1}" in
     "${python_exec}" studenttests.py -- "${@:2}"
     ;;
   part_a)
-    "${python_exec}" unittests.py -v TestAbs TestRelu TestArgmax TestDot TestMatmul -- "${@:2}"
+    "${python_exec}" unittests.py -v TestAbs TestRelu TestArgmax TestDot -- "${@:2}"
     ;;
   part_b)
-    "${python_exec}" unittests.py -v TestReadMatrix TestWriteMatrix TestClassify TestChain -- "${@:2}"
+    "${python_exec}" unittests.py -v TestMatmul TestReadMatrix TestWriteMatrix TestClassify TestChain -- "${@:2}"
     ;;
   test_abs)
     "${python_exec}" unittests.py -v TestAbs -- "${@:2}"
