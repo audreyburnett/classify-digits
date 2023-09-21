@@ -22,7 +22,7 @@ relu:
     li a0 36
     j exit
 loop_start:
-    lw t3 0(t2) 
+    lw t3 0(t2) #load current int into t2
     bge t3 x0 loop_continue #if the int is greater than or equal to 0, go to loop_continue (no changes need to be made)
     #otherwise, change the value to 0:
     sw x0 0(t2) #replaces the negative value with 0 
@@ -33,7 +33,6 @@ loop_continue:
     bne t4 a1 loop_start #if we have not reached the end of the array, go back to loop_start
    
 loop_end:
-    
     # Epilogue
 
     jr ra
