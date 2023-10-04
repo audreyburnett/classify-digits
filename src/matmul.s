@@ -25,7 +25,7 @@
 # =======================================================
 matmul:
     # Prologue
-    addi sp sp -44
+    addi sp sp -52
     sw s0, 0(sp)
     sw s1, 4(sp)
     sw s2, 8(sp)
@@ -36,7 +36,9 @@ matmul:
     sw s7, 28(sp)
     sw s8, 32(sp)
     sw s9, 36(sp)
-    sw ra, 40(sp)
+    sw s10, 40(sp)
+    sw s11, 44(sp)
+    sw ra, 48(sp)
     
     mv s0 a0 
     mv s1 a1
@@ -48,6 +50,8 @@ matmul:
     addi s7 x0 0 #current row index
     addi s8 x0 0 #current col index
     add s9 a6 x0 #memory location in a6
+    mv s10 a0 
+    mv s10 a3
     
     
     # Error checks
@@ -66,7 +70,7 @@ matmul:
 outer_loop_start:
     #rows of d -> 0 to a1
     beq s7 s1 outer_loop_end #break if row index equals num rows
-    addi s7 x0 0 #reset col index to 0 
+    addi s8 x0 0 #reset col index to 0 
     
    
 
@@ -75,12 +79,15 @@ inner_loop_start:
     beq s8 s5 inner_loop_end #break if col index equals num cols
     
     mul t0 s2 s7 #set t0 to cols in the first array times current row index
-    add s0 s0 t0 #set the pointer to the address of second array + offset of t0
-    mv a0 s0 #set pointer to first array
-    add a1 s3 s8 #set pointer to address of second array + offset of current col
+    addi t1 x0 4 #set t1 to 4
+    mul t0 t0 t1 #multiply t0 by 4
+    add s10 s0 t0 #set the pointer to the address of second array + offset of t0
+    mv a0 s10 #set pointer to first array
+    mul t0 s8 t1 # t0 is s8 (offset) times 4
+    add a1 s3 t0 #set pointer to address of second array + offset of current col
     mv a2 s2 #number of elements to use is col of first array 
     addi a3 x0 1 #stride of first array is 1
-    mv a4 a5 #stride of second array is # of col of second array
+    mv a4 s5 #stride of second array is # of col of second array
     jal ra, dot 
     
     sw a0 0(s9) #stores returned dot product in current index of the output array
@@ -111,7 +118,9 @@ outer_loop_end:
     lw s7, 28(sp)
     lw s8, 32(sp)
     lw s9, 36(sp)
-    lw ra, 40(sp)
-    addi sp sp 44
+    lw s10, 40(sp)
+    lw s11, 44(sp)
+    lw ra, 48(sp)
+    addi sp sp 52
 
     jr ra
