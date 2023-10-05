@@ -109,7 +109,8 @@ classify:
     jal ra malloc 
     beq a0 x0 malloc_fail
     
-
+    addi sp sp -4
+    sw a0 0(sp)
     
     mv a6 a0 #a6: pointer to where h should be stored
     mv s0 a6 #store a6 in s0
@@ -137,7 +138,8 @@ classify:
     jal ra malloc 
     beq a0 x0 malloc_fail
     
-   
+    addi sp sp -4
+    sw a0 0(sp)
     
     mv a6 a0 #a6: pointer to where o should be stored
     mv a3 s0 #a3: pointer to h
@@ -183,6 +185,12 @@ classify:
         li a0 31 #exit with error code 31
         j exit
     continue:  
+        lw a0 0(sp)
+        addi sp sp 4
+        jal ra free
+        lw a0 0(sp)
+        addi sp sp 4
+        jal ra free
         mv a0 s3 #free s3 pointer (rows of m0)
         jal ra free
         mv a0 s4 #free s4 pointer (cols of m0)
