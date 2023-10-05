@@ -36,11 +36,11 @@ write_matrix:
 
     mv s0 a0 #s0: pointer to string of filename
     mv s1 a1 #s1: pointer to matrix in mem
-    mv s2 a2 #s2: pointer to integer for num of rows
-    mv s3 a3 #s3: pointer to integer for num of cols
+    mv s2 a2 #s2: num of rows
+    mv s3 a3 #s3: num of cols
 
     #a0 is already a pointer to a string of the filename
-    addi t0 t0 1 #set t0 to 1
+    addi t0 x0 1 #set t0 to 1
     mv a1 t0 #set permission bits to 1 for write-only
     jal ra fopen
     
@@ -54,39 +54,43 @@ write_matrix:
         
         #WRITE ROW NUM
         #a0 already returned by fopen
-        mv a2 s2 #a2 is pointer to store num rows
-        addi a3 x0 4 #set a3 to 4 to read 4 bytes from the file
-        addi s6 a3 0 #set s6 to a3
+        addi sp sp -4
+        sw s2 0(sp) #store number of rows in memory
+        mv a1 sp #set a1 to pointer where num of rows is stored
+        addi a2 x0 1 #a2: 1 element to write
+        addi a3 x0 4 #a3: each element is 4 bytes
+        addi s6 a2 0 #set s6 to a2 (num of elements to write)
         jal ra fwrite 
+        addi sp sp 4
         bne a0 s6 write_error #if we recieve fwrite error or eof
+        
         
         #WRITE COL NUM
         mv a0 s4 #set a0 to file descriptor
-        mv a3 s3 #a3 is pointer to store num cols
-        addi a4 x0 4 #set a4 to 4 to read 4 bytes from the file
-        addi s6 a4 0 #set s6 to a4
-        jal ra fwrite
+        addi sp sp -4
+        sw s3 0(sp) #store number of cols in memory
+        mv a1 sp #set a1 to pointer where num of rows is stored
+        addi a2 x0 1 #a2: 1 element to write
+        addi a3 x0 4 #a3: each element is 4 bytes
+        addi s6 a2 0 #set s6 to a2 (num of elements to write)
+        jal ra fwrite 
+        addi sp sp 4
         bne a0 s6 write_error #if we recieve fwrite error or eof
-        
-        
+           
         #WRITE MATRIX
-        
         mv a0 s4 #set a0 to file descriptor
         mv a1 s1 #a1 is pointer to store matrix
-        mv a2 s2 #a2 is number of elems to write 
-        mv a3 s3 #a3 is size of each elem
-        mul a5 a2 a3
+        mul s6 s2 s3 #s6 is rows times cols
+        mv a2 s6 #a2 is number of elems to write 
+        addi a3 x0 4 #a3: each element is 4 bytes
         jal ra fwrite
-        beq a0 s5 continue2 #if there is no error, go to continue2
+        beq a0 s6 continue2 #if there is no error, go to continue2
         
         write_error: 
             li a0 30 #exit with error code 30
             j exit
-        malloc_error:
-            li a0 26 #exit with error code 26
-            j exit
         continue2:
-            mv a0 s3 #set a0 to file descriptor
+            mv a0 s4 #set a0 to file descriptor
             jal ra fclose
             beq a0 x0 finish #go to finish if no error, otherwise throw an error
             

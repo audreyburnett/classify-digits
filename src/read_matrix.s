@@ -39,9 +39,8 @@ read_matrix:
     
     
     mv s0 a0 #s0: pointer to string of filenam
-    mv s1 a1 #s1: pointer to matrix in memory
-    mv s2 a2 #s1: pointer to integer for num of rows
-    mv s3 a3 #s2: pointer to integer for num of cols
+    mv s1 a1 #s1: pointer to integer for num of rows
+    mv s2 a2 #s2: pointer to integer for num of cols
 
     #a0 is already a pointer to a string of the filename
     mv a1 x0 #set permission bits t0 0 for read-only
